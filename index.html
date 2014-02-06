@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>milkcocoa game</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+            <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+            <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+            <script src="http://127.0.0.1:3000/js/milkcocoa.js"></script>
+            <script>
+        	function escapeHTML(val) {
+                return $('<div>').text(val).html();
+            };
+            	function refresh_html(id, args) {
+            		$("#content").html($("#" + id).html());
+            		if(id == "signin-html") {
+                    	$("#signin").click(function() {
+                    		var email = $('#signin-form [name=email]').val()
+                    		var password = $('#signin-form [name=password]').val()
+                        	milkcocoa.Account.signIn(email, password, function(e, dataStore) {
+                        		console.log(e);
+                        		if(e.success) {
+                        			refresh_html("memo-html", {userDataStore : dataStore});
+                        		}else{
+                            		alert("signin failed.");
+                        		}
+                        	});
+                     		return false;
+                    	});
+                    	$("#signup").click(function() {
+                    		var email = $('#signup-form [name=email]').val()
+                    		var password = $('#signup-form [name=password]').val()
+                        	milkcocoa.Account.signUp(email, password, {}, function(e) {
+                        		if(e) {
+                            		alert("signup success!!");
+                        		}else{
+                            		alert("signup failed!!");
+                        		}
+                        	});
+                     		return false;
+                    	});
+            		}else if(id == "signup-html") {
+            		}else if(id == "memo-html") {
+                        var ds = args.userDataStore;
+                        ds.child("messages").findMany(-7, 7, function(messageStore, e) {
+                            for(var i=0;i < e.length;i++) {
+                                $("#messages").append('<div id="'+e[i].id+'">' + escapeHTML(e[i].content) + "</div>");
+                            }
+                        });
+                        ds.child("messages").on("push", function(e) {
+                            $("#messages").append(escapeHTML(e.content) + "<br>");
+                        });
+                        $("#post").click(function() {
+                            ds.child("messages").push({
+                                title : "タイトル",
+                                content : $("#message-content").val()
+                            }, function(e) {
+                                $("#message-content").val("");
+                            });
+                        });
+            		}
+            	}
+                pour_the_milk("127.0.0.1:3000", "loginapp", function() {
+                	milkcocoa.Account.getCurrentUser( function(e, dataStore) {
+                		if(e.success) {
+                			refresh_html("memo-html", {userDataStore : dataStore});
+                		}else{
+                			refresh_html("signin-html")
+                		}
+                	});
+                })
+                
+                </script>
+    </head>
+    <body>
+    	<script id="signup-html" type="text/html">
+		<div>
+    	<form id="signup-form">
+    	<input type="text" name="email" />
+    	<input type="password" name="password" />
+        <button id="signup">SignUp</button>
+        </form>
+		</div>
+		</script>
+    	<script id="signin-html" type="text/html">
+		<div>
+    	<form id="signin-form">
+    	<input type="text" name="email" />
+    	<input type="password" name="password" />
+        </form>
+        <button id="signin">SignIn</button>
+		</div>
+		<div>
+    	<form id="signup-form">
+    	<input type="text" name="email" />
+    	<input type="password" name="password" />
+        <button id="signup">SignUp</button>
+        </form>
+		</div>
+		</script>
+    	<script id="memo-html" type="text/html">
+		<div>
+		memo
+        <textarea id="message-content" cols="32" rows="4"></textarea>
+        <button id="post">Post</button>
+        <div id="messages"></div>
+		</div>
+		</script>
+		<div id="content"></div>
+    </body>
+</html>

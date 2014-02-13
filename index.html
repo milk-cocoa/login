@@ -2,7 +2,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>milkcocoa game</title>
+        <title>memo</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
         <!-- Latest compiled and minified CSS -->
@@ -22,10 +22,10 @@
                     	$("#signin").click(function() {
                     		var email = $('#signin-form [name=email]').val()
                     		var password = $('#signin-form [name=password]').val()
-                        	milkcocoa.Account.signIn(email, password, function(e) {
-                        		console.log(e);
-                        		if(e.success) {
-                            		var ds = new milkcocoa.DataStore("memo." + e.user.id);
+                        	milkcocoa.Account.signIn(email, password, function(err, user) {
+                        		console.log(user);
+                        		if(user) {
+                            		var ds = new milkcocoa.DataStore("memo." + user.id);
                         			refresh_html("memo-html", {userDataStore : ds});
                         		}else{
                             		alert("signin failed.");
@@ -40,8 +40,8 @@
                     		if(password != confirm) {
                     			return false;
                     		}
-                        	milkcocoa.Account.signUp(email, password, {}, function(e) {
-                        		if(e) {
+                        	milkcocoa.Account.signUp(email, password, {}, function(err, user) {
+                        		if(user) {
                             		alert("signup success!!");
                         		}else{
                             		alert("signup failed!!");
@@ -71,9 +71,10 @@
             		}
             	}
                 pour_the_milk("127.0.0.1:3000", "loginapp", function() {
-                	milkcocoa.Account.getCurrentUser( function(e, dataStore) {
-                		if(e.success) {
-                    		var ds = new milkcocoa.DataStore("memo." + e.user.id);
+                	milkcocoa.Account.getCurrentUser( function(err, user) {
+                		console.log(user);
+                		if(user) {
+                    		var ds = new milkcocoa.DataStore("memo." + user.id);
                 			refresh_html("memo-html", {userDataStore : ds});
                 		}else{
                 			refresh_html("signin-html")

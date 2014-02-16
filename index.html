@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-            <script src="http://127.0.0.1:3000/js/milkcocoa.js"></script>
+            <script src="http://mlkcca.com/js/milkcocoa.js"></script>
             <script>
         	function escapeHTML(val) {
                 return $('<div>').text(val).html();
@@ -25,7 +25,7 @@
                         	milkcocoa.Account.signIn(email, password, function(err, user) {
                         		console.log(user);
                         		if(user) {
-                            		var ds = new milkcocoa.DataStore("memo." + user.id);
+                            		var ds = new milkcocoa.DataStore("memo").child(user.id);
                         			refresh_html("memo-html", {userDataStore : ds});
                         		}else{
                             		alert("signin failed.");
@@ -52,7 +52,7 @@
             		}else if(id == "signup-html") {
             		}else if(id == "memo-html") {
                         var ds = args.userDataStore;
-                        ds.findMany({}).done(function(e) {
+                        ds.query({}).done(function(e) {
                             for(var i=0;i < e.length;i++) {
                                 $("#messages").append('<div id="'+e[i].id+'">' + escapeHTML(e[i].content) + "</div>");
                             }
@@ -70,11 +70,11 @@
                         });
             		}
             	}
-                pour_the_milk("127.0.0.1:3000", "loginapp", function() {
+                pour_the_milk("mlkcca.com", "loginapp", function() {
                 	milkcocoa.Account.getCurrentUser( function(err, user) {
                 		console.log(user);
                 		if(user) {
-                    		var ds = new milkcocoa.DataStore("memo." + user.id);
+                    		var ds = new milkcocoa.DataStore("memo").child(user.id);
                 			refresh_html("memo-html", {userDataStore : ds});
                 		}else{
                 			refresh_html("signin-html")

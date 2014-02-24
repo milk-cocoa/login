@@ -11,119 +11,124 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-            <script src="http://mlkcca.com/js/milkcocoa.js"></script>
-            <script>
-        	function escapeHTML(val) {
-                return $('<div>').text(val).html();
-            };
-            	function refresh_html(id, args) {
-            		$("#content").html($("#" + id).html());
-            		if(id == "signin-html") {
-                    	$("#signin").click(function() {
-                    		var email = $('#signin-form [name=email]').val()
-                    		var password = $('#signin-form [name=password]').val()
-                        	milkcocoa.Account.signIn(email, password, function(err, user) {
-                        		console.log(user);
-                        		if(user) {
-                            		var ds = new milkcocoa.DataStore("memo").child(user.id);
-                        			refresh_html("memo-html", {userDataStore : ds});
-                        		}else{
-                            		alert("signin failed.");
-                        		}
-                        	});
-                     		return false;
-                    	});
-                    	$("#signup").click(function() {
-                    		var email = $('#signup-form [name=email]').val()
-                    		var password = $('#signup-form [name=password]').val()
-                    		var confirm = $('#signup-form [name=confirm]').val()
-                    		if(password != confirm) {
-                    			return false;
-                    		}
-                        	milkcocoa.Account.signUp(email, password, {}, function(err, user) {
-                        		if(user) {
-                            		alert("signup success!!");
-                        		}else{
-                            		alert("signup failed!!");
-                        		}
-                        	});
-                     		return false;
-                    	});
-            		}else if(id == "signup-html") {
-            		}else if(id == "memo-html") {
-                        var ds = args.userDataStore;
-                        ds.query({}).done(function(e) {
-                            for(var i=0;i < e.length;i++) {
-                                $("#messages").append('<div id="'+e[i].id+'">' + escapeHTML(e[i].content) + "</div>");
-                            }
-                        });
-                        ds.on("push", function(e) {
-                            $("#messages").append(escapeHTML(e.content) + "<br>");
-                        });
-                        $("#post").click(function() {
-                            ds.push({
-                                title : "タイトル",
-                                content : $("#message-content").val()
-                            }, function(e) {
-                                $("#message-content").val("");
-                            });
-                        });
-            		}
-            	}
-                pour_the_milk("mlkcca.com", "loginapp", function() {
-                	milkcocoa.Account.getCurrentUser( function(err, user) {
+        <script src="rview.js"></script>
+        <script src="http://mlkcca.com/js/v2/milkcocoa.js"></script>
+        <script>
+    	function escapeHTML(val) {
+            return $('<div>').text(val).html();
+        };
+        $(function() {
+        	var milkcocoa = new MilkCocoa("https://mlkcca.com:3000", "loginapp", function() {});
+        	milkcocoa.getCurrentUser(function(err, user) {
+        		if(user) {
+            		var ds = new milkcocoa.DataStore("memo").child(user.id);
+            		rview.transition("memo", {userDataStore : ds, user_id : user.id});
+        		}else{
+            		rview.transition("signin", {});
+        		}
+        	});
+        	rview.view("signin",
+        			['<div>',
+        			 '<form id="signin-form" class="form-signin" role="form">',
+        			 '<h2 class="form-signin-heading">Please sign in</h2>',
+        			 '<input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>',
+        			 '<input type="password" name="password" class="form-control" placeholder="Password" required>',
+        			 '<button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">SignIn</button>',
+        			 '</form>',
+        			 '<a>新規登録はこちら</a>',
+        			 '</div>']
+        			, function() {
+        		$("a").click(function() {
+            		rview.transition("signup", {});
+        		});
+            	$("#signin").click(function() {
+            		var email = $('#signin-form [name=email]').val()
+            		var password = $('#signin-form [name=password]').val()
+                	milkcocoa.signIn(email, password, function(err, user) {
                 		console.log(user);
                 		if(user) {
-                    		var ds = new milkcocoa.DataStore("memo").child(user.id);
-                			refresh_html("memo-html", {userDataStore : ds});
+                    		var ds = milkcocoa.DataStore("memo").child(user.id);
+                    		rview.transition("memo", {userDataStore : ds, user_id : user.id});
                 		}else{
-                			refresh_html("signin-html")
+                    		alert("signin failed.");
                 		}
                 	});
-                })
-                
-                </script>
+             		return false;
+            	});
+        	});
+        	
+        	rview.view("signup",
+        			['<div>',
+        			 '<form id="signup-form" class="form-signin" role="form">',
+        			 '<h2 class="form-signin-heading">Please sign up</h2>',
+        			 '<input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>',
+        			 '<input type="password" name="password" class="form-control" placeholder="Password" required>',
+        			 '<input type="password" name="confirm" class="form-control" placeholder="Confirm" required>',
+        			 '<button id="signup" class="btn btn-lg btn-primary btn-block" type="submit">SignUp</button>',
+        			 '</form>',
+        			 '<a>サインインはこちら</a>',
+        			 '</div>']
+        			, function() {
+        		$("a").click(function() {
+            		rview.transition("signin", {});
+        		});
+            	$("#signup").click(function() {
+            		var email = $('#signup-form [name=email]').val()
+            		var password = $('#signup-form [name=password]').val()
+            		var confirm = $('#signup-form [name=confirm]').val()
+            		if(password != confirm) {
+            			return false;
+            		}
+                	milkcocoa.signUp(email, password, {}, function(err, user) {
+                		if(user) {
+                    		milkcocoa.DataStore("memo").child(user.id).child('user_id').set(user.id);
+                    		rview.transition("signin", {});
+                		}else{
+                    		alert("signup failed!!");
+                		}
+                	});
+             		return false;
+            	});
+        	});
+        	
+        	rview.view("memo", ['<div class="panel panel-primary">',
+        	        			'<div class="panel-heading">',
+        	        			'<h3 class="panel-title">Your Memo</h3>',
+        	        			'</div>',
+        	        			'<div class="panel-body">',
+        	        			'<textarea id="message-content" cols="32" rows="4"></textarea>',
+        	        		    '<button id="post" class="btn btn-primary">add memo</button>',
+        	                	'<div id="messages"></div>',
+        	        			'</div>',
+        	        			'</div>',
+        	        			'<a>サインアウト</a>'], function(args) {
+        		$('a').click(function() {
+        			milkcocoa.signOut(function() {
+                		rview.transition("signin", {});
+        			});
+        		});
+                var ds = args.userDataStore;
+                ds.query({}).done(function(e) {
+                    for(var i=0;i < e.length;i++) {
+                        $("#messages").append('<div id="'+e[i].id+'">' + escapeHTML(e[i].content) + "</div>");
+                    }
+                });
+                ds.on("push", function(e) {
+                    $("#messages").append(escapeHTML(e.content) + "<br>");
+                });
+                $("#post").click(function() {
+                    ds.push({
+                        title : "タイトル",
+                        content : $("#message-content").val()
+                    }, function(e) {
+                        $("#message-content").val("");
+                    });
+                });
+        	});
+        });
+        </script>
     </head>
     <body>
-    	<script id="signup-html" type="text/html">
-    	<form id="signup-form">
-    	<input type="text" name="email" />
-    	<input type="password" name="password" />
-        <button id="signup">SignUp</button>
-        </form>
-		</div>
-		</script>
-    	<script id="signin-html" type="text/html">
-		<div>
-    	<form id="signin-form" class="form-signin" role="form">
-		<h2 class="form-signin-heading">Please sign in</h2>
-        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" name="password" class="form-control" placeholder="Password" required>
-        <button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">SignIn</button>
-        </form>
-		</div>
-		<div>
-    	<form id="signup-form" class="form-signin" role="form">
-		<h2 class="form-signin-heading">Please sign up</h2>
-        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" name="password" class="form-control" placeholder="Password" required>
-        <input type="password" name="confirm" class="form-control" placeholder="Confirm" required>
-        <button id="signup" class="btn btn-lg btn-primary btn-block" type="submit">SignUp</button>
-        </form>
-		</div>
-		</script>
-    	<script id="memo-html" type="text/html">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h3 class="panel-title">Your Memo</h3>
-			</div>
-			<div class="panel-body">
-				<textarea id="message-content" cols="32" rows="4"></textarea>
-		        <button id="post" class="btn btn-primary">add memo</button>
-        		<div id="messages"></div>
-			</div>
-		</div>
-		</script>
 		<div id="content" class="container"></div> <!-- /container -->
     </body>
 </html>

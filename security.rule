@@ -1,0 +1,4 @@
+/memo/[userid]/* {
+  permit : all;
+  rule : account.id == userid;
+}

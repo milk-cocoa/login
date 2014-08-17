@@ -12,16 +12,16 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
         <script src="rview.js"></script>
-        <script src="http://mlkcca.com/js/v2/milkcocoa.js"></script>
+        <script src="http://cdn.mlkcca.com/v0.2.5/milkcocoa.js"></script>
         <script>
     	function escapeHTML(val) {
             return $('<div>').text(val).html();
         };
         $(function() {
-        	var milkcocoa = new MilkCocoa("https://mlkcca.com:3000", "loginapp", function() {});
+        	var milkcocoa = new MilkCocoa("https://io-chyxzfwa5.mlkcca.com");
         	milkcocoa.getCurrentUser(function(err, user) {
         		if(user) {
-            		var ds = new milkcocoa.DataStore("memo").child(user.id);
+            		var ds = new milkcocoa.dataStore("memo").child(user.id);
             		rview.transition("memo", {userDataStore : ds, user_id : user.id});
         		}else{
             		rview.transition("signin", {});
@@ -44,10 +44,10 @@
             	$("#signin").click(function() {
             		var email = $('#signin-form [name=email]').val()
             		var password = $('#signin-form [name=password]').val()
-                	milkcocoa.signIn(email, password, function(err, user) {
+                	milkcocoa.login(email, password, function(err, user) {
                 		console.log(user);
                 		if(user) {
-                    		var ds = milkcocoa.DataStore("memo").child(user.id);
+                    		var ds = milkcocoa.dataStore("memo").child(user.id);
                     		rview.transition("memo", {userDataStore : ds, user_id : user.id});
                 		}else{
                     		alert("signin failed.");
@@ -79,9 +79,9 @@
             		if(password != confirm) {
             			return false;
             		}
-                	milkcocoa.signUp(email, password, {}, function(err, user) {
+                	milkcocoa.addAccount(email, password, {}, function(err, user) {
                 		if(user) {
-                    		milkcocoa.DataStore("memo").child(user.id).child('user_id').set(user.id);
+                    		milkcocoa.dataStore("memo").child(user.id).child('user_id').set(user.id);
                     		rview.transition("signin", {});
                 		}else{
                     		alert("signup failed!!");
@@ -103,7 +103,7 @@
         	        			'</div>',
         	        			'<a>サインアウト</a>'], function(args) {
         		$('a').click(function() {
-        			milkcocoa.signOut(function() {
+        			milkcocoa.logout(function() {
                 		rview.transition("signin", {});
         			});
         		});
@@ -114,15 +114,13 @@
                     }
                 });
                 ds.on("push", function(e) {
-                    $("#messages").append(escapeHTML(e.content) + "<br>");
+                    $("#messages").append(escapeHTML(e.value.content) + "<br>");
                 });
                 $("#post").click(function() {
                     ds.push({
-                        title : "タイトル",
                         content : $("#message-content").val()
-                    }, function(e) {
-                        $("#message-content").val("");
                     });
+                    $("#message-content").val("");
                 });
         	});
         });

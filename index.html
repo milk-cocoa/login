@@ -27,17 +27,7 @@
             		rview.transition("signin", {});
         		}
         	});
-        	rview.view("signin",
-        			['<div>',
-        			 '<form id="signin-form" class="form-signin" role="form">',
-        			 '<h2 class="form-signin-heading">Please sign in</h2>',
-        			 '<input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>',
-        			 '<input type="password" name="password" class="form-control" placeholder="Password" required>',
-        			 '<button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">SignIn</button>',
-        			 '</form>',
-        			 '<a>新規登録はこちら</a>',
-        			 '</div>']
-        			, function() {
+        	rview.view("signin", "signin-html", function() {
         		$("a").click(function() {
             		rview.transition("signup", {});
         		});
@@ -57,18 +47,7 @@
             	});
         	});
         	
-        	rview.view("signup",
-        			['<div>',
-        			 '<form id="signup-form" class="form-signin" role="form">',
-        			 '<h2 class="form-signin-heading">Please sign up</h2>',
-        			 '<input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>',
-        			 '<input type="password" name="password" class="form-control" placeholder="Password" required>',
-        			 '<input type="password" name="confirm" class="form-control" placeholder="Confirm" required>',
-        			 '<button id="signup" class="btn btn-lg btn-primary btn-block" type="submit">SignUp</button>',
-        			 '</form>',
-        			 '<a>サインインはこちら</a>',
-        			 '</div>']
-        			, function() {
+        	rview.view("signup", "signup-html", function() {
         		$("a").click(function() {
             		rview.transition("signin", {});
         		});
@@ -91,17 +70,7 @@
             	});
         	});
         	
-        	rview.view("memo", ['<div class="panel panel-primary">',
-        	        			'<div class="panel-heading">',
-        	        			'<h3 class="panel-title">Your Memo</h3>',
-        	        			'</div>',
-        	        			'<div class="panel-body">',
-        	        			'<textarea id="message-content" cols="32" rows="4"></textarea>',
-        	        		    '<button id="post" class="btn btn-primary">add memo</button>',
-        	                	'<div id="messages"></div>',
-        	        			'</div>',
-        	        			'</div>',
-        	        			'<a>サインアウト</a>'], function(args) {
+        	rview.view("memo", "memo-html", function(args) {
         		$('a').click(function() {
         			milkcocoa.logout(function() {
                 		rview.transition("signin", {});
@@ -129,4 +98,40 @@
     <body>
 		<div id="content" class="container"></div> <!-- /container -->
     </body>
+    <script id="memo-html" type="text/html">
+        <div class="panel panel-primary">
+        <div class="panel-heading">
+        <h3 class="panel-title">Your Memo</h3>
+        </div>
+        <div class="panel-body">
+        <textarea id="message-content" cols="32" rows="4"></textarea>
+        <button id="post" class="btn btn-primary">add memo</button>
+        <div id="messages"></div>
+        </div>
+        </div>
+        <a>サインアウト</a>
+    </script>
+    <script id="signup-html" type="text/html">
+        <div>
+        <form id="signup-form" class="form-signin" role="form">
+        <h2 class="form-signin-heading">Please sign up</h2>
+        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+        <input type="password" name="confirm" class="form-control" placeholder="Confirm" required>
+        <button id="signup" class="btn btn-lg btn-primary btn-block" type="submit">SignUp</button>
+        </form>
+        <a>サインインはこちら</a>
+        </div>
+    </script>
+    <script id="signin-html" type="text/html">
+        <div>
+        <form id="signin-form" class="form-signin" role="form">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+        <button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">SignIn</button>
+        </form>
+        <a>新規登録はこちら</a>
+        </div>
+    </script>
 </html>

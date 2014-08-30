@@ -11,127 +11,55 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-        <script src="rview.js"></script>
-        <script src="http://cdn.mlkcca.com/v0.2.5/milkcocoa.js"></script>
-        <script>
-    	function escapeHTML(val) {
-            return $('<div>').text(val).html();
-        };
-        $(function() {
-        	var milkcocoa = new MilkCocoa("https://io-chyxzfwa5.mlkcca.com");
-        	milkcocoa.getCurrentUser(function(err, user) {
-        		if(user) {
-            		var ds = new milkcocoa.dataStore("memo").child(user.id);
-            		rview.transition("memo", {userDataStore : ds, user_id : user.id});
-        		}else{
-            		rview.transition("signin", {});
-        		}
-        	});
-        	rview.view("signin", "signin-html", function() {
-        		$("a").click(function() {
-            		rview.transition("signup", {});
-        		});
-            	$("#signin").click(function() {
-            		var email = $('#signin-form [name=email]').val()
-            		var password = $('#signin-form [name=password]').val()
-                	milkcocoa.login(email, password, function(err, user) {
-                		console.log(user);
-                		if(user) {
-                    		var ds = milkcocoa.dataStore("memo").child(user.id);
-                    		rview.transition("memo", {userDataStore : ds, user_id : user.id});
-                		}else{
-                    		alert("signin failed.");
-                		}
-                	});
-             		return false;
-            	});
-        	});
-        	
-        	rview.view("signup", "signup-html", function() {
-        		$("a").click(function() {
-            		rview.transition("signin", {});
-        		});
-            	$("#signup").click(function() {
-            		var email = $('#signup-form [name=email]').val()
-            		var password = $('#signup-form [name=password]').val()
-            		var confirm = $('#signup-form [name=confirm]').val()
-            		if(password != confirm) {
-            			return false;
-            		}
-                	milkcocoa.addAccount(email, password, {}, function(err, user) {
-                		if(user) {
-                    		milkcocoa.dataStore("memo").child(user.id).child('user_id').set(user.id);
-                    		rview.transition("signin", {});
-                		}else{
-                    		alert("signup failed!!");
-                		}
-                	});
-             		return false;
-            	});
-        	});
-        	
-        	rview.view("memo", "memo-html", function(args) {
-        		$('a').click(function() {
-        			milkcocoa.logout(function() {
-                		rview.transition("signin", {});
-        			});
-        		});
-                var ds = args.userDataStore;
-                ds.query({}).done(function(e) {
-                    for(var i=0;i < e.length;i++) {
-                        $("#messages").append('<div id="'+e[i].id+'">' + escapeHTML(e[i].content) + "</div>");
-                    }
-                });
-                ds.on("push", function(e) {
-                    $("#messages").append(escapeHTML(e.value.content) + "<br>");
-                });
-                $("#post").click(function() {
-                    ds.push({
-                        content : $("#message-content").val()
-                    });
-                    $("#message-content").val("");
-                });
-        	});
-        });
-        </script>
-    </head>
-    <body>
-		<div id="content" class="container"></div> <!-- /container -->
-    </body>
-    <script id="memo-html" type="text/html">
+        <script src="http://cdn.mlkcca.com/v0.2.7/milkcocoa.js"></script>
+    <script id="memo-template" type="text/template">
         <div class="panel panel-primary">
         <div class="panel-heading">
         <h3 class="panel-title">Your Memo</h3>
         </div>
         <div class="panel-body">
-        <textarea id="message-content" cols="32" rows="4"></textarea>
-        <button id="post" class="btn btn-primary">add memo</button>
-        <div id="messages"></div>
+        <textarea v-model="new_memo" cols="32" rows="4"></textarea>
+        <button class="btn btn-primary" v-on="click: add_memo()">add memo</button>
+        <div v-repeat="memos">
+            <div v-text="content"></div>
         </div>
         </div>
-        <a>サインアウト</a>
+        </div>
+        <a v-on="click: logout()">ログアウト</a>
     </script>
-    <script id="signup-html" type="text/html">
+    <script id="register-template" type="text/template">
         <div>
-        <form id="signup-form" class="form-signin" role="form">
+        <form class="form-signin" role="form">
         <h2 class="form-signin-heading">Please sign up</h2>
-        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" name="password" class="form-control" placeholder="Password" required>
-        <input type="password" name="confirm" class="form-control" placeholder="Confirm" required>
-        <button id="signup" class="btn btn-lg btn-primary btn-block" type="submit">SignUp</button>
+        <input type="email" class="form-control" v-model="email" placeholder="Email address" required autofocus>
+        <input type="password" class="form-control" v-model="password" placeholder="Password" required>
+        <input type="password" class="form-control" v-model="confirm" placeholder="Confirm" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" v-on="click: register()">新規登録</button>
         </form>
-        <a>サインインはこちら</a>
+        <a v-on="click: goto_login_view()">ログインはこちら</a>
         </div>
     </script>
-    <script id="signin-html" type="text/html">
+
+    <script id="login-template" type="text/template">
         <div>
-        <form id="signin-form" class="form-signin" role="form">
+        <form  class="form-signin" role="form">
         <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" name="password" class="form-control" placeholder="Password" required>
-        <button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">SignIn</button>
+        <input type="email" class="form-control" v-model="email" placeholder="Email address" required autofocus>
+        <input type="password" class="form-control" v-model="password" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" v-on="click: login()">ログイン</button>
         </form>
-        <a>新規登録はこちら</a>
+        <a v-on="click: goto_reg_view()">新規登録はこちら</a>
         </div>
     </script>
+    </head>
+    <body>
+		<div class="container">
+            <div id="content">
+                <div v-view="currentView"></div>
+            </div>
+        </div> <!-- /container -->
+        <script src="js/lib/vue.min.js"></script>
+        <script src="js/login.js"></script>
+    </body>
+
 </html>

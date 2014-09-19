@@ -2,53 +2,60 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>memo</title>
+        <title>Login Sample</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-        <script src="http://cdn.mlkcca.com/v0.2.7/milkcocoa.js"></script>
+        <link rel="stylesheet" href="css/login.css">
+        <script src="http://cdn.mlkcca.com/v0.2.8/milkcocoa.js"></script>
     <script id="memo-template" type="text/template">
-        <div class="panel panel-primary">
-        <div class="panel-heading">
-        <h3 class="panel-title">Your Memo</h3>
+        <div class="panel">
+            <div class="panel-heading">
+                <div class="panel-title">Hello <span v-text="email"></span>. These are yor memos.</div>
+                <a class="logout-btn pull-right" v-on="click: logout()">ログアウト</a>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                        <div class="post-form">
+                            <input class="post-form-text" type="text" v-model="new_memo" />
+                            <button class="post-form-btn" v-on="click: add_memo()">add memo</button>
+                        </div>
+                </div>
+                <div class="content-memo">
+                    <div class="content-memo-item" v-repeat="memos | memo_filter" v-class="content-memo-item-1:color1,content-memo-item-2:color2" v-text="content"></div>
+                </div>
+            </div>
         </div>
-        <div class="panel-body">
-        <textarea v-model="new_memo" cols="32" rows="4"></textarea>
-        <button class="btn btn-primary" v-on="click: add_memo()">add memo</button>
-        <div v-repeat="memos">
-            <div v-text="content"></div>
-        </div>
-        </div>
-        </div>
-        <a v-on="click: logout()">ログアウト</a>
     </script>
     <script id="register-template" type="text/template">
         <div>
-        <form class="form-signin" role="form">
-        <h2 class="form-signin-heading">Please sign up</h2>
-        <input type="email" class="form-control" v-model="email" placeholder="Email address" required autofocus>
-        <input type="password" class="form-control" v-model="password" placeholder="Password" required>
-        <input type="password" class="form-control" v-model="confirm" placeholder="Confirm" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" v-on="click: register()">新規登録</button>
-        </form>
-        <a v-on="click: goto_login_view()">ログインはこちら</a>
+        <h2 class="form-signin-heading">新規登録</h2>
+        <div>
+            <input type="email" class="form-item-text" v-model="email" placeholder="Email address" required autofocus>
+        </div>
+        <div>
+            <input type="password" class="form-item-text" v-model="password" placeholder="Password" required>
+        </div>
+        <div>
+            <input type="password" class="form-item-text" v-model="confirm" placeholder="Confirm" required>
+        </div>
+        <div v-text="message"></div>
+        <button class="btn" v-on="click: register()">新規登録</button>
+        <a class="link-btn" v-on="click: goto_login_view()">ログインはこちら</a>
         </div>
     </script>
 
     <script id="login-template" type="text/template">
         <div>
-        <form  class="form-signin" role="form">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="email" class="form-control" v-model="email" placeholder="Email address" required autofocus>
-        <input type="password" class="form-control" v-model="password" placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" v-on="click: login()">ログイン</button>
-        </form>
-        <a v-on="click: goto_reg_view()">新規登録はこちら</a>
+        <h2 class="form-signin-heading">ログイン</h2>
+        <div>
+            <input type="email" class="form-item-text" v-model="email" placeholder="Email address" required autofocus>
+        </div>
+        <div>
+            <input type="password" class="form-item-text" v-model="password" placeholder="Password" required>
+        </div>
+        <div v-text="message"></div>
+        <button class="btn" v-on="click: login()">ログイン</button>
+        <a class="link-btn" v-on="click: goto_reg_view()">新規登録はこちら</a>
         </div>
     </script>
     </head>

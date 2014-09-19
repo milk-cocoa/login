@@ -1,0 +1,114 @@
+body {
+	font-size: 0.75rem;
+	font-family: Helvetica,Arial,sans-serif;
+	background-color: #fff;
+	color: #333;	
+}
+
+.container {
+	margin: 0 auto;
+	padding: 5px;
+}
+
+@media screen and (min-width: 481px) and (max-width: 830px) {
+  .container {
+	width: 400px;
+  }
+}
+@media screen and (min-width: 831px) {
+  .container {
+	width: 700px;
+  }
+}
+
+.panel-body {
+	padding-top: 50px;
+}
+
+.panel-title {
+	font-size: 20px;
+}
+
+.form-item {
+	padding: 2px;
+}
+
+.form-item-text {
+	font-size: 18px;
+}
+
+.btn {
+	color: #fff;
+	width: 100px;
+	height: 28px;
+	margin: 2px;
+	background-color: #009F8C;
+	border: none;
+	cursor: pointer;
+}
+
+
+.post-form {
+}
+.post-form:after {
+	content: " ";
+    display: table;
+    clear: both;
+}
+
+.post-form-text {
+	font-size: 18px;
+	float: left;
+}
+
+.post-form-btn {
+	color: #fff;
+	width: 100px;
+	height: 28px;
+	margin: 2px;
+	background-color: #009F8C;
+	border: none;
+	cursor: pointer;
+}
+
+.row {
+
+}
+
+.row:after{
+	content: " ";
+    display: table;
+    clear: both;
+}
+
+.pull-right {
+	float: right;
+}
+
+.logout-btn {
+	cursor: pointer;
+}
+
+.link-btn {
+	cursor: pointer;
+}
+
+.content-memo {
+	margin-top: 20px;
+	list-style-type: none;
+}
+
+.content-memo-item {
+	font-size: 18px;
+	padding: 2px 5px;
+	margin: 0px 0;
+	color: #fff;
+}
+
+.content-memo-item-1 {
+	background-color: #40BFB0;
+}
+
+.content-memo-item-2 {
+	background-color: #009F8C;
+}

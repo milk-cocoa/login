@@ -1,7 +1,8 @@
 (function(){
-	var milkcocoa = new MilkCocoa("https://io-ehz546bne.mlkcca.com");
+	var milkcocoa = new MilkCocoa("https://io-vhylqrfr1.mlkcca.com");
 	var userDataStore = milkcocoa.dataStore("memo");
 	var memoDataStore = null;
+    var current_email = "";
 
 	function escapeHTML(val) {
 		return $('<div>').text(val).html();
@@ -15,15 +16,23 @@
         template: "#login-template",
         data : {
                 email : "",
-                password : ""
+                password : "",
+                message : ""
         },
         methods : {
             login : function() {
                 var self = this;
                 milkcocoa.login(this.email, this.password, function(err, user) {
-                    if(err == null) {
-                        goto_view("memo");
+                    if(err == MilkCocoa.Error.Login.FormatError) {
+                        self.message = "フォーマットエラー";
+                    }else if(err == MilkCocoa.Error.Login.LoginError) {
+                        self.message = "Emailかパスワードが違います。";
+                    }else if(err == MilkCocoa.Error.Login.EmailNotVerificated) {
+                        self.message = "メールを確認してください。";
+                    }else{
+                        current_email = user.email;
                         memoDataStore = getMemoDataStore(user);
+                        location.reload();
                     }
                 });
             },
@@ -44,8 +53,14 @@
             register : function() {
                 var self = this;
                 if(this.password != this.confirm) return;
-                milkcocoa.addAccount(this.email, this.password, {}, function() {
-                    goto_view("login");
+                milkcocoa.addAccount(this.email, this.password, {}, function(err, user) {
+                    if(err == MilkCocoa.Error.AddAccount.FormatError) {
+                        self.message = "フォーマットエラー";
+                    }else if(err == MilkCocoa.Error.AddAccount.AlreadyExist) {
+                        self.message = "Emailアドレスが既に使われています。";
+                    }else{
+                        goto_view("login");
+                    }
                 });
             },
             goto_login_view : function() {
@@ -54,16 +69,27 @@
         }
     });
 
-    Vue.component('memo', {
+    var memo_component = Vue.component('memo', {
         template: "#memo-template",
         data : {
             memos : [],
-            new_memo : ""
+            new_memo : "",
+            email : ""
         },
         filters: {
+            memo_filter : function(memos) {
+                return memos.map(function(memo, index) {
+                    return {
+                        content : memo.content,
+                        color1 : index % 2 == 0,
+                        color2 : index % 2 == 1
+                    }
+                });
+            }
         },
         ready : function() {
             this.fetch();
+            this.email = current_email;
         },
         methods : {
             add_memo : function() {
@@ -105,6 +131,7 @@
     milkcocoa.getCurrentUser(function(err, user) {
         if(user) {
         	memoDataStore = getMemoDataStore(user);
+            current_email = user.email;
             app.currentView = "memo";
         }else{
             app.currentView = "login";

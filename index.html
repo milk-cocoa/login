@@ -10,7 +10,7 @@
     <script id="memo-template" type="text/template">
         <div class="panel">
             <div class="panel-heading">
-                <div class="panel-title">Hello <span v-text="email"></span>. These are yor memos.</div>
+                <div class="panel-title">Hello <span v-text="email"></span>. These are your memos.</div>
                 <a class="logout-btn pull-right" v-on="click: logout()">ログアウト</a>
             </div>
             <div class="panel-body">
@@ -28,7 +28,7 @@
     </script>
     <script id="register-template" type="text/template">
         <div>
-        <h2 class="form-signin-heading">新規登録</h2>
+        <h2>新規登録</h2>
         <div>
             <input type="email" class="form-item-text" v-model="email" placeholder="Email address" required autofocus>
         </div>
@@ -46,7 +46,7 @@
 
     <script id="login-template" type="text/template">
         <div>
-        <h2 class="form-signin-heading">ログイン</h2>
+        <h2>ログイン</h2>
         <div>
             <input type="email" class="form-item-text" v-model="email" placeholder="Email address" required autofocus>
         </div>

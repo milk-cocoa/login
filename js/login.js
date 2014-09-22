@@ -1,5 +1,5 @@
 (function(){
-	var milkcocoa = new MilkCocoa("https://io-vhylqrfr1.mlkcca.com");
+	var milkcocoa = new MilkCocoa("https://io-chyxzfwa5.mlkcca.com");
 	var userDataStore = milkcocoa.dataStore("memo");
 	var memoDataStore = null;
     var current_email = "";
@@ -12,12 +12,18 @@
 		return userDataStore.child(user.id);
 	}
 
+    var app = new Vue({
+        el: '#content',
+        data: {
+            currentView: null
+        }
+    });
+
     Vue.component('login', {
         template: "#login-template",
         data : {
                 email : "",
-                password : "",
-                message : ""
+                password : ""
         },
         methods : {
             login : function() {
@@ -37,7 +43,7 @@
                 });
             },
             goto_reg_view : function() {
-                goto_view("register");
+                app.currentView = "register";
             }
         }
     });
@@ -59,12 +65,12 @@
                     }else if(err == MilkCocoa.Error.AddAccount.AlreadyExist) {
                         self.message = "Emailアドレスが既に使われています。";
                     }else{
-                        goto_view("login");
+                        app.currentView = "login";
                     }
                 });
             },
             goto_login_view : function() {
-                goto_view("login");
+                app.currentView = "login";
             }
         }
     });
@@ -73,8 +79,7 @@
         template: "#memo-template",
         data : {
             memos : [],
-            new_memo : "",
-            email : ""
+            new_memo : ""
         },
         filters: {
             memo_filter : function(memos) {
@@ -101,7 +106,7 @@
             fetch : function() {
                 var self = this;
                 memoDataStore.on("push", function(e) {
-                	self.memos.push({
+                	self.memos.unshift({
                 		content : escapeHTML(e.value.content)
                 	});
                 });
@@ -116,17 +121,6 @@
             }
         }
     });
-
-    var app = new Vue({
-        el: '#content',
-        data: {
-            currentView: 'login'
-        }
-    });
-
-    function goto_view(comp) {
-        app.currentView = comp;
-    }
 
     milkcocoa.getCurrentUser(function(err, user) {
         if(user) {

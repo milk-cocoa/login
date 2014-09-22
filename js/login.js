@@ -1,5 +1,5 @@
 (function(){
-	var milkcocoa = new MilkCocoa("https://io-chyxzfwa5.mlkcca.com");
+	var milkcocoa = new MilkCocoa("https://[your-app-id].mlkcca.com");
 	var userDataStore = milkcocoa.dataStore("memo");
 	var memoDataStore = null;
     var current_email = "";
